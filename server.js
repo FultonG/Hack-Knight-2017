@@ -5,6 +5,7 @@ var path = require('path');
 var twilio = require('twilio');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
 
 var accountSid = process.env.ACC_ID;
 var authToken = process.env.AUTH_TOKEN;
@@ -28,10 +29,15 @@ app.use(express.static('public'));
 var Item = mongoose.model('Item',{
     sensorID: Number,
     itemName: String,
-    isLocked: Boolean
+    isLocked: Boolean,
 });
 
-
+var User = mongoose.model('Item',{
+    username: String,
+    password: String,
+    sensorID: [Number],
+    phoneNumber: String
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
@@ -137,11 +143,11 @@ app.get('/checkState/:sensorID', function(req,res){
 });
 
 app.post('/addUser', function(req, res){
-
   if(req.body.userName && req.body.password){
+    var passHash = bcrypt.hashSync(req.body.password);
     var user = new User({
       userName : req.body.userName,
-      password : req.body.password,
+      password : passHash,
       sensorID:[]
     });
     user.save()
