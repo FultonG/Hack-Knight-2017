@@ -1,7 +1,7 @@
-angular.module('DashboardCtrl', []).controller('DashboardController', function($scope) {
+angular.module('DashboardCtrl', []).controller('DashboardController', function($scope, Device) {
 
-  $scope.submit = function(){
-      console.log(SignIn.SignIn($scope.user));
+  $scope.addDevice = function(){
+      Device.add($scope.device);
     }
 
 });

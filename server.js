@@ -73,7 +73,7 @@ function isAuthenticated(req, res, next) {
             }
             else{
                 if(data){
-                    User.update({'userName':sess.user},{$push:{'sensorID':sensorID}},function(error,data){
+                    User.update({'userName' : sess.user},{$push:{'sensorID' : sensorID}},function(error,data){
                         if(error){
                             console.log(error);
                         }
@@ -98,21 +98,7 @@ app.post('/registerDevice',function(req,res){
     });
     device.save();
     res.sendStatus(200);
-})
-
-//gets sent from web frontend
-app.post('/registerName',function(req,res){
-    var itemName = req.body.itemName;
-    var sensorID = req.body.sensorID;
-    Item.update({'sensorID' : sensorID},{'itemName':itemName},function(error,data){
-        if(error){
-            console.log(error)
-        }
-        else{
-            res.sendStatus(200);
-        }
-    });
-})
+});
 
 app.get('/findAll', function(req, res){
   Item.find({}, function(err, data){
@@ -199,7 +185,7 @@ app.post('/addUser', function(req, res){
     });
     user.save()
   }
-  res.sendStatus(200);
+  res.json({redirect : "/"});
 });
 
 app.post('/login',function(req,res){

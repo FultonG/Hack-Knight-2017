@@ -1,1 +1,1 @@
-angular.module('HackKnight', ['ngRoute','ngResource', 'appRoutes', 'MainCtrl', 'RegisterCtrl', 'DashboardCtrl', 'SignInService']);
+angular.module('HackKnight', ['ngRoute','ngResource', 'appRoutes', 'MainCtrl', 'RegisterCtrl', 'DashboardCtrl', 'SignInService', 'DeviceService']);
