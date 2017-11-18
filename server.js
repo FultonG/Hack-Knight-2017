@@ -65,6 +65,29 @@ function isAuthenticated(req, res, next) {
       }
     }
 
+    app.post('/addDevice', isAuthenticated, function(req,res){
+        var sensorID = req.body.sensorID;
+        Item.findOne({'sensorID':sensorID}).exec(function(error,data){
+            if(error){
+                console.log(error);
+            }
+            else{
+                if(data){
+                    User.update({'userName':sess.user},{$push:{'sensorID':sensorID}},function(error,data){
+                        if(error){
+                            console.log(error);
+                        }
+                        else{
+                            res.sendStatus(200);
+                        }
+                    })
+                }
+
+            }
+        })
+
+    })
+
 //gets sent from arduino
 app.post('/registerDevice',function(req,res){
     var sensorID = req.body.sensorID;
