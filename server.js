@@ -28,7 +28,14 @@ app.use(express.static('public'));
 var Item = mongoose.model('Item',{
     sensorID: Number,
     itemName: String,
-    isLocked: Boolean
+    isLocked: Boolean,
+});
+
+var User = mongoose.model('Item',{
+    username: String,
+    password: String,
+    sensorID: [Number],
+    phoneNumber: String
 });
 
 app.use(bodyParser.json());
