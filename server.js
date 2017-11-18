@@ -16,10 +16,14 @@ var saltrounds = 10;
 app.use(express.static('public'));
 
 app.use(session({
-    secret: 'pinga',
+    secret: process.env.SECRET,
     cookie:{maxAge:600000}
 
 }));
+
+app.get('/', function(req,res){
+  res.sendFile(path.join(__dirname + '/public/index.html'));
+});
 
 /*client.messages.create({
     body: 'This is the second message you are getting, congrats. This is still working!!',
@@ -49,22 +53,17 @@ var User = mongoose.model('User',{
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
-
 function isAuthenticated(req, res, next) {
     sess = req.session;
     console.log("Checking for authentication (isAuthenticated)")
     if(sess.user){
         console.log("User '"+sess.user+ "' is authenticated!")
         next();
-}   else if (!sess.user){
-    console.log("User not authenticated!")
-    res.redirect('/');
-}
-}
-
-app.get('/',function(req,res){
-    res.sendFile(__dirname+'/public/index.html');
-})
+      } else if (!sess.user){
+        console.log("User not authenticated!")
+        res.redirect('/');
+      }
+    }
 
 //gets sent from arduino
 app.post('/registerDevice',function(req,res){
@@ -153,6 +152,7 @@ app.get('/checkState/:sensorID', function(req,res){
                 if(data2 && !error2){
                     console.log(data2);
                     //twilio stuff
+                    //client.sendMessage();
                 }
                 else if(error2){
                     console.log(error);
@@ -181,27 +181,29 @@ app.post('/addUser', function(req, res){
 
 app.post('/login',function(req,res){
     sess = req.session;
-    var userName = req.params.userName;
-    var password = req.params.password;
+    var userName = req.body.userName;
+    var password = req.body.password;
     User.findOne({'userName':userName}).exec(function(error,data){
         if(error){
             console.log(error);
         }
         else{
             if(data){
-                if(password === data.password){
+                if(bcrypt.compareSync(password, data.password)){
                     sess.user = data.userName;
-                    res.redirect('/dashboard');
+                    res.json({redirect : "/dashboard"});
                 }
                 else{
-                    res.redirect('/');
+                    res.json({redirect : "/"});
                 }
             }
         }
     })
-})
+});
 
-
+app.get('/*', isAuthenticated, function(req, res){
+  res.sendFile(path.join(__dirname + '/public/index.html'));
+});
 
 // Listen for requests at this port
 app.listen(8080,function(){

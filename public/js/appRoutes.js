@@ -11,6 +11,10 @@ $routeProvider
     .when('/register', {
       templateUrl: 'views/register.html',
       controller: 'RegisterController'
+    })
+    .when('/dashboard', {
+      templateUrl: 'views/dashboard.html',
+      controller: 'DashboardController'
     });
 
 $locationProvider.html5Mode(true);
