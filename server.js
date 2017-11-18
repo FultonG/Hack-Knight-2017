@@ -5,13 +5,19 @@ var path = require('path');
 var twilio = require('twilio');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-
+var session = require('express-session');
 var accountSid = process.env.ACC_ID;
 var authToken = process.env.AUTH_TOKEN;
 mongoose.connect(process.env.MONGO);
 
 var client = new twilio(accountSid, authToken);
 app.use(express.static('public'));
+
+app.use(session({
+    secret: 'pinga',
+    cookie:{maxAge:600000}
+
+}));
 
 /*client.messages.create({
     body: 'This is the second message you are getting, congrats. This is still working!!',
@@ -35,6 +41,23 @@ var Item = mongoose.model('Item',{
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
+
+
+function isAuthenticated(req, res, next) {
+    sess = req.session;
+    console.log("Checking for authentication (isAuthenticated)")
+    if(sess.user){
+        console.log("User '"+sess.user+ "' is authenticated!")
+        next();
+}   else if (!sess.user){
+    console.log("User not authenticated!")
+    res.redirect('/');
+}
+}
+
+app.get('/',function(req,res){
+    res.sendFile(__dirname+'/public/index.html');
+})
 
 //gets sent from arduino
 app.post('/registerDevice',function(req,res){
@@ -148,6 +171,28 @@ app.post('/addUser', function(req, res){
   }
   res.sendStatus(200);
 });
+
+app.post('/login',function(req,res){
+    sess = req.session;
+    var userName = req.params.userName;
+    var password = req.params.password;
+    User.findOne({'userName':userName}).exec(function(error,data){
+        if(error){
+            console.log(error);
+        }
+        else{
+            if(data){
+                if(password === data.password){
+                    sess.user = data.userName;
+                    res.redirect('/dashboard');
+                }
+                else{
+                    res.redirect('/');
+                }
+            }
+        }
+    })
+})
 
 
 
