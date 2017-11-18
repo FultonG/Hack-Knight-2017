@@ -138,7 +138,7 @@ app.get('/checkState/:sensorID', function(req,res){
 
 app.post('/addUser', function(req, res){
 
-  if(req.body.first && req.body.last){
+  if(req.body.userName && req.body.password){
     var user = new User({
       userName : req.body.userName,
       password : req.body.password,
@@ -148,6 +148,8 @@ app.post('/addUser', function(req, res){
   }
   res.sendStatus(200);
 });
+
+
 
 // Listen for requests at this port
 app.listen(8080,function(){
