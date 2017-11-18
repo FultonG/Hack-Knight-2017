@@ -31,6 +31,8 @@ var Item = mongoose.model('Item',{
     isLocked: Boolean
 });
 
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -117,17 +119,37 @@ app.get('/checkState/:sensorID', function(req,res){
         }
         else{
             console.log(data);
+            User.findOne({'sensorID':req.params.sensorID}).exec(function(error2,data2){
+                if(data2 && !error2){
+                    console.log(data2);
+                    //twilio stuff
+                }
+                else if(error2){
+                    console.log(error);
+                }
+                else{
+                    res.send(200);
+                }
+
+            })
         }
     })
-
-    if(true){
-      //client.sendMessage();
-        //Twilio stuff
-    }
-    else{
-
-    }
 });
+
+app.post('/addUser', function(req, res){
+
+  if(req.body.userName && req.body.password){
+    var user = new User({
+      userName : req.body.userName,
+      password : req.body.password,
+      sensorID:[]
+    });
+    user.save()
+  }
+  res.sendStatus(200);
+});
+
+
 
 // Listen for requests at this port
 app.listen(8080,function(){
