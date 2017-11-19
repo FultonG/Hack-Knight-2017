@@ -100,13 +100,13 @@ app.post('/registerDevice',function(req,res){
     res.sendStatus(200);
 });
 
-app.get('/findAll', function(req, res){
-  Item.find({}, function(err, data){
+app.get('/findAll', isAuthenticated, function(req, res){
+  User.findOne({userName:sess.user}, function(err, data){
       if(err){
           console.log(err)
       }
       else{
-          res.json(data);
+          res.json(data.sensorID);
       }
   });
 });
@@ -160,8 +160,19 @@ app.get('/checkState/:sensorID', function(req,res){
             User.findOne({'sensorID':req.params.sensorID}).exec(function(error2,data2){
                 if(data2 && !error2){
                     console.log(data2);
+                    var phoneNumber = data2.phoneNumber;
+                    client.messages.create({
+                        body: 'This is the second message you are getting, congrats. This is still working!!',
+                        to: phoneNumber,
+                        from: process.env.FROM_NUM
+                    }).then(function(data) {
+                      console.log('Administrator notified');
+                    }).catch(function(err) {
+                      console.error('Could not notify administrator');
+                      console.error(err);
+                    });
                     //twilio stuff
-                    //client.sendMessage();
+                    client.sendMessage();
                 }
                 else if(error2){
                     console.log(error);
